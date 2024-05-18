@@ -11,6 +11,9 @@ POST http://localhost:3001/api/persons/ HTTP/1.1
 content-type: application/json
 
 {
-    "name": "Test15",
-    "number": "123-456-7890"
+    "name": "Naoi Rei",
+    "number": "444-444-4444"
 }
+
+###
+GET http://localhost:3001/api/persons/6647af36353f36f4338c6ae5
