@@ -16,10 +16,23 @@ mongoose.connect(url)
         console.log('Error connecting to MongoDB:', error.message)
     })
 
+function phoneFormatValidator(number) {
+    // Validate phone number to be integers in XXX-XXX-XXXX format
+    return (/\d{3}-\d{3}-\d{4}/.test(number) || /\d{2}-\d{7}/.test(number) || /\d{3}-\d{8}/.test(number))
+}
 // Data schema for a person
 const personSchema = new mongoose.Schema({
-    name: String,
-    number: String,
+    // Make name required and three characters minimum
+    name: {
+        type: String,
+        minLength: 3,
+        required: [true, 'Name required']
+    },
+    number: {
+        type: String,
+        validate: {validator: phoneFormatValidator, message: props => `${props.value} is not a valid phone number!`},
+        required: [true, 'Phone number required']
+    },
 })
 
 // Set/define options for the person schema, specifically in instance when it's converted to JSON

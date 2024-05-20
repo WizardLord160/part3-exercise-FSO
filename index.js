@@ -62,12 +62,6 @@ app.delete('/api/persons/:id', (request, response, next) => {
 app.post('/api/persons', (request, response, next) => {
     // Adds a person to the database
     const body = request.body
-    // Check if any field is missing
-    if (body.name === undefined) {
-        return response.status(400).json({error: 'name missing'})
-    } else if (body.number === undefined) {
-        return response.status(400).json({error: 'number missing'})
-    }
     
     // Create new person according to person schema
     const person = new Person({
@@ -86,13 +80,19 @@ app.put('/api/persons/:id', (request, response, next) => {
     const body = request.body
 
     // Update just the number
-    const newNumber = {
-        ...body, 
-        number: body.number
-    }
+    // const newNumber = {
+    //     ...body, 
+    //     number: body.number
+    // }
   
-    // Update the person with a new number, specifying 'new' to return updated document
-    Person.findByIdAndUpdate(request.params.id, newNumber, {new: true})
+    // Update the person with the new number, specifying 'new' to return updated document
+    // Validation doesn't work on updates by default, so explicitly configured here
+    // Requires query, not schema, context for validator to be able to access specific fields of the document
+    Person.findByIdAndUpdate(
+        request.params.id,
+        {...body, number: body.number},
+        {new: true, runValidators: true, context: "query"}
+    )
         .then(updatedPerson => {
             response.json(updatedPerson)
         })
@@ -105,8 +105,10 @@ const errorHandler = (error, request, response, next) => {
     console.error(error.message)
 
     if (error.name === 'CastError') {
-      return response.status(400).send({error:'malformatted id'})
-    } 
+        return response.status(400).send({error:'malformatted id'})
+    } else if (error.name === 'ValidationError') {
+        return response.status(400).json({error: error.message})
+    }
     next(error)
   }
 // Should be the last loaded middleware, also after all routes already registered
