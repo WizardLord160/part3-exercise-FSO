@@ -18,7 +18,8 @@ mongoose.connect(url)
 
 function phoneFormatValidator(number) {
     // Validate phone number to be integers in XXX-XXX-XXXX format
-    return (/\d{3}-\d{3}-\d{4}/.test(number) || /\d{2}-\d{7}/.test(number) || /\d{3}-\d{8}/.test(number))
+    // return (/\d{3}-\d{3}-\d{4}/.test(number) || /\d{2}-\d{7}/.test(number) || /\d{3}-\d{8}/.test(number))
+    return /^(0\d{1,2}-\d{6,})$/.test(number)
 }
 // Data schema for a person
 const personSchema = new mongoose.Schema({
